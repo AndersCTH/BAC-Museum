@@ -84,8 +84,10 @@ U_total = 200.0
 C_air = Volym * 1200.0
 C_walls = C_air * 5.0
 
+# Starttillstånd
 T_room, T_structure = 20.0, 20.0
-g_rum = rh_to_absolute_moisture(T_room, 50.0)
+RH_initial = 50.0
+g_rum = rh_to_absolute_moisture(T_room, RH_initial)
 humidifier_on = False  
 
 pid_radiator = IndustrialPID(rad_Xp, rad_Ti, rad_Td, dt, output_limits=(0, 15000))
@@ -95,7 +97,7 @@ steps_delay = max(1, int((dead_time_min * 60) / dt))
 delay_T_supply = deque([T_room] * steps_delay, maxlen=steps_delay)
 delay_g_supply = deque([g_rum] * steps_delay, maxlen=steps_delay)
 
-data_log = []
+data_log =
 
 for s in range(steg):
     t_timmar = (s * dt) / 3600.0
@@ -117,7 +119,7 @@ for s in range(steg):
     else:
         flow = ((3.0 * Volym) / 3600) if T_room > 22.0 else ((0.5 * Volym) / 3600)
     
-    RH_exhaust = absolute_moisture_to_rh(T_rum, g_rum)
+    RH_exhaust = absolute_moisture_to_rh(T_room, g_rum)
     if RH_exhaust <= RH_setpoint:
         humidifier_on = True
     elif RH_exhaust >= RH_stop_limit:
@@ -136,7 +138,7 @@ for s in range(steg):
         eta_recovery = 1.0 
         q_heating = (seq_output - 100.0) / 100.0 * 12000.0 
 
-    T_after_recovery = T_outdoor + eta_recovery * (T_rum - T_outdoor) if T_rum > T_outdoor else T_outdoor
+    T_after_recovery = T_outdoor + eta_recovery * (T_room - T_outdoor) if T_room > T_outdoor else T_outdoor
     air_mass_flow = flow * 1.2
     T_supply_calc = T_after_recovery + (q_heating - q_cooling) / (air_mass_flow * 1000.0) if air_mass_flow > 0 else T_outdoor
     T_supply_calc = max(15.0, min(28.0, T_supply_calc)) 
@@ -171,7 +173,7 @@ st.subheader("📥 Hämta simuleringsdata")
 csv = df.to_csv(index=False, sep=';').encode('utf-8-sig')
 st.download_button(label="Ladda ned simuleringsresultat (.CSV)", data=csv, file_name='museum_data.csv', mime='text/csv')
 
-# --- PLOTTA GRAFER UTAN WITH-SATSER ---
+# --- PLOTTA GRAFER ---
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
 
 ax1.plot(df['Tid (h)'], df['Rumstemperatur (C)'], 'r-', label="Innetemp (°C)", linewidth=2)

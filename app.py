@@ -51,7 +51,7 @@ st.title("🏛️ Klimatstyrning i Museum")
 st.markdown("Interaktivt simuleringsverktyg för studier av temperatur, fukt och sekvensreglering i en museisal under 24 timmar.")
 
 # Sidomeny
-st.sidebar.header("🎯 Borvärden (Setpoints)")
+st.sidebar.header("🎯 Börvärden (Setpoints)")
 T_setpoint = st.sidebar.slider("Börvärde Temperatur (°C)", 18.0, 25.0, 21.0, 0.5)
 RH_setpoint = st.sidebar.slider("Börvärde Fukt Start (RH %)", 30.0, 60.0, 45.0, 1.0)
 RH_stop_limit = st.sidebar.slider("Befuktare Stopp-gräns (RH %)", 50.0, 75.0, 60.0, 1.0)
@@ -179,11 +179,15 @@ for s in range(steg):
     T_supply_calc = max(15.0, min(28.0, T_supply_calc)) 
     rad_power = pid_radiator.calculate(T_setpoint, T_room)
 
+    # Lägg till i dötids-köer
     delay_T_supply.append(T_supply_calc)
     delay_g_supply.append(g_supply_calc)
-    T_supply_actual = delay_T_supply
-    g_supply_actual = delay_g_supply
+    
+    # HÄR ÄR RÄTTELSEN: Plockar ut värdet [0] (äldsta värdet) ur dötidsköerna
+    T_supply_actual = delay_T_supply[0]
+    g_supply_actual = delay_g_supply[0]
 
+    # Fysikaliska balanser
     q_trans = U_total * (T_room - T_outdoor)
     q_structure = 500.0 * (T_room - T_structure)
     q_vent = flow * 1.2 * 1000 * (T_supply_actual - T_room)
@@ -216,6 +220,7 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
 ax1.plot(df['Tid'], df['T_inne'], 'r-', label="Innetemp", linewidth=2)
 ax1.axhline(T_setpoint, color='g', linestyle='--', label="Borvarde")
 ax1.plot(df['Tid'], df['T_ute'], 'k--', alpha=0.4, label="Utetemp")
+ax1.set_ylabel("Temperatur (°C)")
 ax1.grid(True)
 ax1.legend()
 
@@ -223,6 +228,7 @@ ax1.legend()
 ax2.plot(df['Tid'], df['RH_inne'], 'b-', label="RH", linewidth=2)
 ax2.axhline(RH_setpoint, color='g', linestyle=':', label="Start")
 ax2.axhline(RH_stop_limit, color='r', linestyle=':', label="Stopp")
+ax2.set_ylabel("Relativ fuktighet (%)")
 ax2.set_ylim(20, 80)
 ax2.grid(True)
 ax2.legend()
@@ -231,12 +237,16 @@ ax2.legend()
 ax3.plot(df['Tid'], df['Rec'], 'orange', label="Atervinnare")
 ax3.plot(df['Tid'], df['Varmare'], 'r-', label="Luftvarmare")
 ax3.plot(df['Tid'], df['Kylare'], 'b-', label="Luftkylare")
+ax3.set_ylabel("LBA Sekvenser Pådrag")
+ax3.set_xlabel("Tid (h)")
 ax3.grid(True)
 ax3.legend()
 
 # Graf 4: Rumsenheter
 ax4.plot(df['Tid'], df['Rad'], 'brown', label="Radiator PI")
 ax4.plot(df['Tid'], df['Flow'], 'c-', label="Flakt PID")
+ax4.set_ylabel("Ställdon på rumssidan")
+ax4.set_xlabel("Tid (h)")
 ax4.grid(True)
 ax4.legend()
 

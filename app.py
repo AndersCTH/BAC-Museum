@@ -97,7 +97,8 @@ steps_delay = max(1, int((dead_time_min * 60) / dt))
 delay_T_supply = deque([T_room] * steps_delay, maxlen=steps_delay)
 delay_g_supply = deque([g_rum] * steps_delay, maxlen=steps_delay)
 
-data_log =
+# HÄR ÄR RÄTTELSEN: Skapar en tom lista för loggningen med parenteser
+data_log = []
 
 for s in range(steg):
     t_timmar = (s * dt) / 3600.0

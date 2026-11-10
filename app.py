@@ -247,7 +247,7 @@ with col1:
     fig3, ax3 = plt.subplots(figsize=(6, 3.5))
     ax3.plot(df['Tid (h)'], df['Återvinnare (%)'], 'orange', label="Återvinnare (%)")
     ax3.plot(df['Tid (h)'], df['Eftervärmning (kW)'], 'r-', label="Värmebatteri (kW)")
-Använd koden med försiktighet.
+
 ax3.plot(df['Tid (h)'], df['Kylbatteri (kW)'], 'b-', label="Kylbatteri (kW)")
 ax3.set_ylabel("Pådrag / Effekt")
 ax3.set_xlabel("Tid (timmar)")
